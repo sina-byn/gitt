@@ -1,0 +1,36 @@
+{
+  "name": "gitt",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "bin": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prebuild": "rimraf dist -I",
+    "build": "tsc",
+    "prepublish": "npm run build"
+  },
+  "author": "Sina Bayandorian <sina.sina.bayan@protonmail.com> (https://portfolio-sina-byn.vercel.app/)",
+  "description": "a CLI that helps you write better commit messages",
+  "repository": "github:sina-byn/gitt",
+  "homepage": "https://github.com/sina-byn/gitt#readme",
+  "keywords": [
+    "git",
+    "cli",
+    "commit"
+  ],
+  "bugs": {
+    "url": "https://github.com/sina-byn/cmtu/issues",
+    "email": "sina.sina.bayan@protonmail.com"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.8",
+    "rimraf": "^5.0.7",
+    "typescript": "^5.5.2"
+  }
+}
