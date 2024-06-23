@@ -17,6 +17,12 @@ Install dependencies :
 cd gitt && npm i
 ```
 
+Build :
+
+```sh
+npm run build
+```
+
 Initialize :
 ```sh
 npx gitt
