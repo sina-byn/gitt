@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
+import prompts, { type PromptObject } from 'prompts';
 import { spawnSync } from 'child_process';
-import prompts from 'prompts';
 import chalk from 'chalk';
 
 // * data
@@ -10,6 +10,16 @@ import commitChoices from './data/commitChoices.json';
 const commitTypes = commitChoices.map(c => c.value);
 
 (async () => {
+  const args = process.argv.slice(2);
+  const _prompts: PromptObject<string>[] = [];
+  let commitType, commitMessage;
+
+  if (args.length > 0) {
+    [commitType, commitMessage] = args;
+
+    if (!commitTypes.includes(commitType)) throw new Error('invalid commit type provided');
+  }
+
   const choices = commitChoices.map(t => {
     const [mainTitle, titleDescription] = t.title.split(':');
 
@@ -22,25 +32,33 @@ const commitTypes = commitChoices.map(c => c.value);
     };
   });
 
-  const response = await prompts([
-    {
+  if (!commitType) {
+    _prompts.push({
       choices,
       type: 'select',
       name: 'commitType',
       message: `Select your commit type`,
       // @ts-ignore
       optionsPerPage: commitTypes.length,
-    },
-    {
+    });
+  }
+
+  if (!commitMessage) {
+    _prompts.push({
       type: 'text',
       name: 'commitMessage',
       message: `Enter your commit message`,
-    },
-  ]);
+    });
+  }
 
-  const { commitType, commitMessage } = response;
+  const response = await prompts(_prompts);
 
-  if (!commitType || !commitMessage) return;
+  commitType = response.commitType ?? commitType;
+  commitMessage = response.commitMessage ?? commitMessage;
+
+  if (!commitType || !commitMessage) throw new Error('invalid arguments provided');
+
+  commitMessage = commitMessage.replace(/\^/g, '');
 
   const cp = spawnSync('git', ['commit', '-m', `${commitType}: ${commitMessage}`], {
     stdio: 'inherit',
