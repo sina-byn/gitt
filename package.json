@@ -9,6 +9,7 @@
   "scripts": {
     "prebuild": "rimraf dist -I",
     "build": "tsc",
+    "start": "node dist/index.js",
     "prepublish": "npm run build"
   },
   "author": "Sina Bayandorian <sina.sina.bayan@protonmail.com> (https://portfolio-sina-byn.vercel.app/)",
