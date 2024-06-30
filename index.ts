@@ -4,20 +4,13 @@ import { spawnSync } from 'child_process';
 import prompts from 'prompts';
 import chalk from 'chalk';
 
+// * data
+import commitChoices from './data/commitChoices.json';
+
+const commitTypes = commitChoices.map(c => c.value);
+
 (async () => {
-  const commitTypes = [
-    { title: 'feat: New Feature', value: 'feat' },
-    { title: 'fix: Fixing Bugs', value: 'fix' },
-    { title: 'chore: Miscellaneous Changes', value: 'chore' },
-    { title: 'refactor: Code Refactoring', value: 'refactor' },
-    { title: 'docs: Documentation Updates', value: 'docs' },
-    { title: 'style: Code Formatting', value: 'style' },
-    { title: 'test: Testing Updates', value: 'test' },
-    { title: 'perf: Performance Improvements', value: 'perf' },
-    { title: 'ci: Continuous Integration', value: 'ci' },
-    { title: 'build: Build System Updates', value: 'build' },
-    { title: 'revert: Reverting Changes', value: 'revert' },
-  ].map(t => {
+  const choices = commitChoices.map(t => {
     const [mainTitle, titleDescription] = t.title.split(':');
 
     // prettier-ignore
@@ -31,9 +24,9 @@ import chalk from 'chalk';
 
   const response = await prompts([
     {
+      choices,
       type: 'select',
       name: 'commitType',
-      choices: commitTypes,
       message: `Select your commit type`,
       // @ts-ignore
       optionsPerPage: commitTypes.length,
