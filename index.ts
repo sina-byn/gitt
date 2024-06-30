@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const { spawnSync } = require('child_process');
-const prompts = require('prompts');
-const chalk = require('chalk');
+import { spawnSync } from 'child_process';
+import prompts from 'prompts';
+import chalk from 'chalk';
 
 (async () => {
   const commitTypes = [
@@ -35,6 +35,7 @@ const chalk = require('chalk');
       name: 'commitType',
       choices: commitTypes,
       message: `Select your commit type`,
+      // @ts-ignore
       optionsPerPage: commitTypes.length,
     },
     {
