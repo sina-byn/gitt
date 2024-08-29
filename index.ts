@@ -9,12 +9,36 @@ import commitChoices from './data/commitChoices.json';
 
 const commitTypes = commitChoices.map(c => c.value);
 
+const commands: Record<string, string[]> = {
+  log: ['log', '--oneline'],
+  status: ['status'],
+  reset: ['reset', 'HEAD~1'],
+  sreset: ['reset', '--soft', 'HEAD~1'],
+  hreset: ['reset', '--hard', 'HEAD~1'],
+};
+
+// * utils
+const gitSpawn = (...args: string[]) => {
+  const cp = spawnSync('git', [...args], {
+    stdio: 'inherit',
+    encoding: 'utf-8',
+  });
+
+  if (cp.error) {
+    console.error(chalk.redBright(`Error: ${cp.error.message}`));
+  }
+};
+
 (async () => {
   const args = process.argv.slice(2);
   const _prompts: PromptObject<string>[] = [];
   let commitType, commitMessage;
 
   if (args.length > 0) {
+    const initialArg = args[0];
+
+    if (initialArg in commands) return gitSpawn(...commands[initialArg]);
+
     [commitType, commitMessage] = args;
 
     if (!commitTypes.includes(commitType)) throw new Error('invalid commit type provided');
@@ -60,12 +84,5 @@ const commitTypes = commitChoices.map(c => c.value);
 
   commitMessage = commitMessage.replace(/\^/g, '');
 
-  const cp = spawnSync('git', ['commit', '-m', `${commitType}: ${commitMessage}`], {
-    stdio: 'inherit',
-    encoding: 'utf-8',
-  });
-
-  if (cp.error) {
-    console.error(chalk.redBright(`Error: ${cp.error.message}`));
-  }
+  gitSpawn('commit', '-m', `${commitType}: ${commitMessage}`);
 })();
