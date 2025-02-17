@@ -3,6 +3,12 @@
 import prompts, { type PromptObject } from 'prompts';
 import { spawnSync } from 'child_process';
 import chalk from 'chalk';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+// * utils
+import { createCommitCompletions } from './utils';
 
 // * data
 import commitChoices from './data/commitChoices.json';
@@ -32,6 +38,7 @@ const gitSpawn = (...args: string[]) => {
 (async () => {
   const args = process.argv.slice(2);
   const _prompts: PromptObject<string>[] = [];
+  const spellCheck = !args.includes('--no-check');
   let commitType, commitMessage;
 
   if (args.length > 0) {
@@ -83,6 +90,50 @@ const gitSpawn = (...args: string[]) => {
   if (!commitType || !commitMessage) throw new Error('invalid arguments provided');
 
   commitMessage = commitMessage.replace(/\^/g, '');
+
+  if (spellCheck) {
+    const { ok, hasTypo, typos, suggestion } = await createCommitCompletions(commitMessage);
+    if (!ok) throw new Error('Failed checking commit message for typos');
+
+    if (hasTypo) {
+      console.log(chalk.yellowBright('Typos found:', typos));
+
+      const { accpetion } = await prompts({
+        type: 'select',
+        name: 'accpetion',
+        message: 'Pick an optoin',
+        choices: [
+          { title: `AI Suggestion - ${suggestion}`, value: 'incoming' },
+          { title: 'Previous - your own original commit', value: 'previous' },
+          { title: 'Overwrite', value: 'overwrite' },
+        ],
+      });
+
+      switch (accpetion) {
+        case 'incoming':
+          commitMessage = suggestion;
+        case 'previous':
+          break;
+        case 'overwrite':
+          const { overwrittenCommitMessage } = await prompts(
+            {
+              type: 'text',
+              name: 'overwrittenCommitMessage',
+              message: `Enter your commit message`,
+            },
+            {
+              onCancel: () => {
+                throw new Error('Commit message is required at this stage');
+              },
+            }
+          );
+
+          commitMessage = overwrittenCommitMessage;
+      }
+    } else {
+      console.log(chalk.blueBright('No typos found'));
+    }
+  }
 
   gitSpawn('commit', '-m', `${commitType}: ${commitMessage}`);
 })();
