@@ -41,6 +41,8 @@ const gitSpawn = (...args: string[]) => {
   const spellCheck = !args.includes('--no-check');
   let commitType, commitMessage;
 
+  if (!spellCheck) args.splice(args.indexOf('--no-check'), 1);
+
   if (args.length > 0) {
     const initialArg = args[0];
 
