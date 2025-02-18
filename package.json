@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "prebuild": "rimraf dist -I",
-    "build": "tsc",
+    "build": "cross-env NODE_ENV=production tsc",
     "start": "npm run build && node dist/index.js",
     "prepublish": "npm run build"
   },
@@ -33,6 +33,7 @@
   "devDependencies": {
     "@types/node": "^20.14.8",
     "@types/prompts": "^2.4.9",
+    "cross-env": "^7.0.3",
     "rimraf": "^5.0.7",
     "typescript": "^5.5.2"
   }
