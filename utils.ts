@@ -9,12 +9,17 @@ const HAS_CREDENTIALS = !!API_KEY && !!ACCOUNT_ID;
 // * types
 type AIResponse = { success: boolean; result: { response: string } };
 
-type TypoCheckResult = { ok: boolean; hasTypo: boolean; typos: string[]; suggestion: string };
+type TypoCheckResult = {
+  ok: 'skip' | boolean;
+  hasTypo: boolean;
+  typos: string[];
+  suggestion: string;
+};
 
 export const createCommitCompletions = async (commitMessage: string): Promise<TypoCheckResult> => {
   if (!HAS_CREDENTIALS) {
     console.warn(chalk.yellowBright('Provide Cloudflare AI credentials'));
-    return { ok: false } as TypoCheckResult;
+    return { ok: 'skip' } as TypoCheckResult;
   }
 
   const response = await fetch(

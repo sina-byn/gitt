@@ -96,45 +96,48 @@ const gitSpawn = (...args: string[]) => {
 
   if (spellCheck) {
     const { ok, hasTypo, typos, suggestion } = await createCommitCompletions(commitMessage);
+
     if (!ok) throw new Error('Failed checking commit message for typos');
 
-    if (hasTypo) {
-      console.log(chalk.yellowBright('Typos found:', typos));
+    if (ok !== 'skip') {
+      if (hasTypo) {
+        console.log(chalk.yellowBright('Typos found:', typos));
 
-      const { accpetion } = await prompts({
-        type: 'select',
-        name: 'accpetion',
-        message: 'Pick an optoin',
-        choices: [
-          { title: `AI Suggestion - ${suggestion}`, value: 'incoming' },
-          { title: 'Previous - your own original commit', value: 'previous' },
-          { title: 'Overwrite', value: 'overwrite' },
-        ],
-      });
+        const { accpetion } = await prompts({
+          type: 'select',
+          name: 'accpetion',
+          message: 'Pick an optoin',
+          choices: [
+            { title: `AI Suggestion - ${suggestion}`, value: 'incoming' },
+            { title: 'Previous - your own original commit', value: 'previous' },
+            { title: 'Overwrite', value: 'overwrite' },
+          ],
+        });
 
-      switch (accpetion) {
-        case 'incoming':
-          commitMessage = suggestion;
-        case 'previous':
-          break;
-        case 'overwrite':
-          const { overwrittenCommitMessage } = await prompts(
-            {
-              type: 'text',
-              name: 'overwrittenCommitMessage',
-              message: `Enter your commit message`,
-            },
-            {
-              onCancel: () => {
-                throw new Error('Commit message is required at this stage');
+        switch (accpetion) {
+          case 'incoming':
+            commitMessage = suggestion;
+          case 'previous':
+            break;
+          case 'overwrite':
+            const { overwrittenCommitMessage } = await prompts(
+              {
+                type: 'text',
+                name: 'overwrittenCommitMessage',
+                message: `Enter your commit message`,
               },
-            }
-          );
+              {
+                onCancel: () => {
+                  throw new Error('Commit message is required at this stage');
+                },
+              }
+            );
 
-          commitMessage = overwrittenCommitMessage;
+            commitMessage = overwrittenCommitMessage;
+        }
+      } else {
+        console.log(chalk.blueBright('No typos found'));
       }
-    } else {
-      console.log(chalk.blueBright('No typos found'));
     }
   }
 
