@@ -2,10 +2,11 @@
 
 import prompts, { type PromptObject } from 'prompts';
 import { spawnSync } from 'child_process';
+import path from 'path';
 import chalk from 'chalk';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 // * utils
 import { createCommitCompletions } from './utils';
