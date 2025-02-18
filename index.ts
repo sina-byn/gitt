@@ -6,7 +6,13 @@ import path from 'path';
 import chalk from 'chalk';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+// prettier-ignore
+const config =
+  process.env.NODE_ENV === 'production'
+    ? { path: path.resolve(__dirname, '..', '.env') }
+    : {};
+
+dotenv.config(config);
 
 // * utils
 import { createCommitCompletions } from './utils';
