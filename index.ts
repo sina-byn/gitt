@@ -77,6 +77,12 @@ const gitSpawn = (...args: string[]) => {
     });
   }
 
+  _prompts.push({
+    type: 'text',
+    name: 'commitSubject',
+    message: `Enter your commit subject`,
+  });
+
   if (!commitMessage) {
     _prompts.push({
       type: 'text',
@@ -86,6 +92,8 @@ const gitSpawn = (...args: string[]) => {
   }
 
   const response = await prompts(_prompts);
+
+  const commitSubject = response.commitSubject.trim();
 
   commitType = response.commitType ?? commitType;
   commitMessage = response.commitMessage ?? commitMessage;
@@ -130,7 +138,7 @@ const gitSpawn = (...args: string[]) => {
                 onCancel: () => {
                   throw new Error('Commit message is required at this stage');
                 },
-              }
+              },
             );
 
             commitMessage = overwrittenCommitMessage;
@@ -141,5 +149,9 @@ const gitSpawn = (...args: string[]) => {
     }
   }
 
-  gitSpawn('commit', '-m', `${commitType}: ${commitMessage}`);
+  gitSpawn(
+    'commit',
+    '-m',
+    `${commitType}${commitSubject ? `(${commitSubject})` : ''}: ${commitMessage.trim()}`,
+  );
 })();
